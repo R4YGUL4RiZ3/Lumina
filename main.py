@@ -5,8 +5,7 @@ from discord.ext import commands
 
 from .bot.lumina import LuminaBot
 
-
-if __name__ == "__main__":
+def main():
     load_dotenv()
     TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -17,3 +16,7 @@ if __name__ == "__main__":
     lumina = LuminaBot(command_prefix=commands.when_mentioned_or('/'), intents=intents)
     
     lumina.run(TOKEN)
+
+
+if __name__ == "__main__":
+    main()
