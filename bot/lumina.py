@@ -1,29 +1,41 @@
 import os
-from dotenv import load_dotenv
 import random
+import json
 from typing import *
 
 import discord
 from discord.ext import commands
 from openai import OpenAI
 
-from utils import *
+from .chat import Chat
+from .utils import *
 
 class LuminaBot(commands.Bot):
     def __init__(self, command_prefix, intents):
         super().__init__(command_prefix, intents=intents)
-        self.client = OpenAI()
-        self.assistant = self.client.beta.assistants.create(
-            name="Lumina",
-            instructions=load_instructions("./bot/instructions.txt"),
-            model="gpt-3.5-turbo-0613",
-            tools=[{"type": "code_interpreter"}]
-        )
-        print(load_instructions("./bot/instructions.txt"))
+        self.chat = Chat(self, load_instructions("./bot/instructions.txt"))
+
         self.bot_active = False
 
+        self._cache_dir = "./cache"
+
     async def on_ready(self):
-        print(f"{self.user} is now online!")
+        guild = self.guilds[0]
+        self._guild_metadata = {
+            "id": guild.id,
+            "name": guild.name,
+            "member_count": guild.member_count,
+            "creation_date": str(guild.created_at),
+        }
+
+        if not os.path.exists(self._cache_dir):
+            os.makedirs(self._cache_dir)
+        with open("./cache/guild_metadata.json", 'w') as f:
+            json.dump(self._guild_metadata, f, indent=6)
+        
+        print(f"\nInstructions: {load_instructions("./bot/instructions.txt")}")
+
+        print(f"{self.user} is now up and running!")
 
     async def on_message(self, message: discord.Message):
         # Debugging
@@ -35,69 +47,34 @@ class LuminaBot(commands.Bot):
             return
         
         if (self.user in message.mentions) or (message.guild is None):
-            await self._init_thread()
-            await message.channel.send("```You have now entered a converation session with Lumina. Type `!quit` to quit.```")
+            try:
+                self.bot_active = True
+                await self.chat.init_thread()
+                await message.channel.send("```You have now entered a converation session with Lumina. Type `!quit` to quit.```\n")
+            except Exception as e:
+                print(e)
+                await message.channel.send("```Something went wrong```")
 
         if self.bot_active:
-            async with message.channel.typing():
-                await self._add_message(message)
-                await self._respond(message)
+            try:
+                async with message.channel.typing():
+                    await self.chat.add_message(message)
+                    await self.chat.respond(message)
+            except Exception as e:
+                print(e)
+                await message.channel.send("```Something went wrong```")
 
         await self._handle_commands(message)
         await self.process_commands(message)
 
-    async def _init_thread(self):
-        self.bot_active = True
-        self._thread = self.client.beta.threads.create()
-
-    async def _add_message(self, message: discord.Message):
-        self._oapi_msg = self.client.beta.threads.messages.create(
-            thread_id=self._thread.id,
-            role="user",
-            content=message.content
-        )
-        
-        self._run = self.client.beta.threads.runs.create(
-            thread_id=self._thread.id,
-            assistant_id=self.assistant.id
-        )
-    
-    async def _respond(self, message: discord.Message):
-        while self._run.status != "completed":
-            current_run = self.client.beta.threads.runs.retrieve(
-                thread_id=self._thread.id,
-                run_id=self._run.id
-            )
-            print(f"Thread run current status: {current_run.status}")
-            
-            if current_run.status == "completed":
-                break
-            
-        response = self.client.beta.threads.messages.list(thread_id=self._thread.id)
-
-        await message.channel.send(response.data[0].content[0].text.value)
-        print(f"\nLUMINA: {response.data[0].content[0].text.value}")
-
     async def _handle_commands(self, message):
-        if not self.bot_active and message.content.startswith('!'):
-            if message.content[1:] == "roll":
+        if message.content.startswith('!'):
+            if not self.bot_active and message.content[1:] == "roll":
                 print("rolling...")
                 random_number = str(random.randint(1, 6))
                 await message.channel.send(random_number)
-            if self.bot.active and message.content[1:] == "quit":
+
+            if self.bot_active and message.content[1:] == "quit":
                 self.bot_active = False
-                del self._thread, self._run, self._oapi_msg
-                await message.channel.send("```You have successfully exit the conversation.```")
-                print(self.bot_active)
-
-if __name__ == "__main__":
-    load_dotenv()
-    TOKEN = os.getenv("DISCORD_TOKEN")
-
-    intents = discord.Intents.default()
-    intents.message_content = True
-    intents.dm_messages = True
-
-    lumina = LuminaBot(command_prefix=commands.when_mentioned_or('/'), intents=intents)
-    
-    lumina.run(TOKEN)
+                self.chat.cleanup()
+                await message.channel.send("\n```You have successfully exit the conversation.```")
