@@ -95,15 +95,16 @@ class LuminaBot(commands.Bot):
                 await message.channel.send("```Something went wrong```")
 
         if self.bot_active:
-            try:
-                async with message.channel.typing():
-                    await self.client.add_message(f"<{message.author.display_name}> " + message.content)
-                    response = await self.client.respond()
-                    await message.channel.send(response)
-                    print(f"\nLUMINA: {response}")
-            except Exception as e:
-                print(e, file=sys.stderr)
-                await message.channel.send("```Something went wrong```")
+            if (len(message.mentions) > 0 and (self.user in message.mentions)) or len(message.mentions) == 0:
+                try:
+                    async with message.channel.typing():
+                        await self.client.add_message(f"<{message.author.display_name}> " + message.content)
+                        response = await self.client.respond()
+                        await message.channel.send(response)
+                        print(f"\nLUMINA: {response}")
+                except Exception as e:
+                    print(e, file=sys.stderr)
+                    await message.channel.send("```Something went wrong```")
 
         await self.process_commands(message)
 
