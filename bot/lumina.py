@@ -14,21 +14,21 @@ class LuminaCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(name="roll", help="Rolls a random number between 1 and 6")
     async def roll(self, ctx: commands.Context):
         if not self.bot.bot_active:
             print("rolling...")
             random_number = str(random.randint(1, 6))
             await ctx.send(random_number)
 
-    @commands.command()
+    @commands.command(name="quit", help="Quit current chat session")
     async def quit(self, ctx: commands.Context):
         if self.bot.bot_active:
             self.bot.bot_active = False
             self.bot.client.cleanup()
             await ctx.send("\n```You have successfully exit the conversation.```")
 
-    @commands.command()
+    @commands.command(name="join_voice", help="Joins current voice chat")
     async def join_voice(self, ctx: commands.Context):
         channel = ctx.author.voice.channel
         if channel:
@@ -36,7 +36,7 @@ class LuminaCog(commands.Cog):
         else:
             await ctx.send("You are not in a voice channel! Join one to get me to join.")
         
-    @commands.command()
+    @commands.command(name="leave_voice", help="Leaves current voice chat")
     async def leave_voice(self, ctx: commands.Context):
         voice = discord.utils.get(self.voice_clients, guild=self.guilds[0])
         
@@ -49,7 +49,7 @@ class LuminaCog(commands.Cog):
 class LuminaBot(commands.Bot):
     def __init__(self, command_prefix, intents):
         super().__init__(command_prefix, intents=intents)
-        self.client = Client(load_instructions("./bot/instructions.txt"))
+        self.client = Client(load_instructions("./bot/instructions.txt"), model="gpt-3.5-turbo-0125")
 
         self.bot_active = False
 

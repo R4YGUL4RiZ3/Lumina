@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 
 class Client:
-    def __init__(self, instructions: str, api_key: str = None):
+    def __init__(self, instructions: str, model: str, api_key: str = None):
         self.client = OpenAI(api_key=api_key)
 
         self.guild_metadata_file = self.client.files.create(
@@ -14,7 +14,7 @@ class Client:
         self.assistant = self.client.beta.assistants.create(
             name="Lumina",
             instructions=instructions,
-            model="gpt-3.5-turbo-0125",
+            model=model,
             tools=[{"type": "code_interpreter"}],
             file_ids=[self.guild_metadata_file.id]
         )
