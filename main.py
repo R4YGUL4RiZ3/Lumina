@@ -4,7 +4,6 @@ import discord
 from discord.ext import commands
 
 from bot import LuminaBot
-# from bot.lumina import LuminaCog
 
 def main():
     load_dotenv()
@@ -15,7 +14,6 @@ def main():
     intents.dm_messages = True
 
     lumina = LuminaBot(command_prefix='!', intents=intents)
-    # lumina.add_cog(LuminaCog)
     
     lumina.run(TOKEN)
 
