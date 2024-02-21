@@ -13,7 +13,7 @@ def main():
     intents.message_content = True
     intents.dm_messages = True
 
-    lumina = LuminaBot(command_prefix=commands.when_mentioned_or('/'), intents=intents)
+    lumina = LuminaBot(command_prefix='!', intents=intents)
     
     lumina.run(TOKEN)
 
