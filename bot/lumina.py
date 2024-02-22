@@ -125,6 +125,9 @@ class LuminaBot(commands.Bot):
     async def _fetch_guid_metadata(self) -> Dict[str, Union[str, int]]:
         guild = self.guilds[0]
         guild_metadata = {
+            "file_metadata": {
+                "name": "guild_metadata.json"
+            },
             "id": guild.id,
             "name": guild.name,
             "member_count": guild.member_count,
@@ -135,7 +138,7 @@ class LuminaBot(commands.Bot):
 
     async def _fetch_chat_history(self) -> Dict[str, Dict[str, str]]:
         guild = self.guilds[0]
-        history = {}
+        history = {"_file_metadata": {"name": "history.json"}}
         for channel in guild.text_channels:
             history_current_channel = []
             async for msg in channel.history(limit=100):
