@@ -12,6 +12,7 @@ def main():
     intents = discord.Intents.default()
     intents.message_content = True
     intents.dm_messages = True
+    intents.members = True
 
     lumina = LuminaBot(command_prefix='!', intents=intents)
     

@@ -1,5 +1,6 @@
 import os
 import sys
+import datetime
 import random
 import json
 from typing import *
@@ -28,6 +29,11 @@ class LuminaCog(commands.Cog):
             self.bot.client.cleanup()
             await ctx.send("\n```You have successfully exit the conversation.```")
 
+    @commands.command(name="stop", help="Forcefully make Lumina stop")
+    async def stop(self, ctx: commands.Context):
+        self.bot.client.cancel_run()
+        await ctx.send("> Successfully made Lumina stop")
+
     @commands.command(name="join_voice", help="Joins current voice chat")
     async def join_voice(self, ctx: commands.Context):
         channel = ctx.author.voice.channel
@@ -45,33 +51,40 @@ class LuminaCog(commands.Cog):
             await ctx.channel.send("> Lumina Left the voice channel")
         else:
             await ctx.channel.send("I'm not in a voice channel!")
-    
+
 class LuminaBot(commands.Bot):
     def __init__(self, command_prefix, intents):
         super().__init__(command_prefix, intents=intents)
-        self.client = Client(load_instructions("./bot/instructions.txt"), model="gpt-3.5-turbo-0125")
-
-        self.bot_active = False
-
         self._cache_dir = "./cache"
+
+        self.client = Client()
+        
+        self.bot_active = False
 
     async def setup_hook(self):
         await self.add_cog(LuminaCog(self))
-
+        
     async def on_ready(self):
-        guild = self.guilds[0]
-        self._guild_metadata = {
-            "id": guild.id,
-            "name": guild.name,
-            "member_count": guild.member_count,
-            "creation_date": str(guild.created_at),
-        }
-
         if not os.path.exists(self._cache_dir):
             os.makedirs(self._cache_dir)
-        with open("./cache/guild_metadata.json", 'w') as f:
-            json.dump(self._guild_metadata, f, indent=6)
-        
+
+        history = await self._fetch_chat_history()
+        with open(os.path.join(self._cache_dir, "history.json"), 'w') as f:
+            json.dump(history, f, indent=4)
+            
+        guild_metadata = await self._fetch_guid_metadata()
+        with open(os.path.join(self._cache_dir, "guild_metadata.json"), 'w') as f:
+            json.dump(guild_metadata, f, indent=4)
+
+        self.client.setup(
+            model="gpt-3.5-turbo-0125",
+            instructions=load_instructions("./bot/instructions.txt"),
+            files=[
+                await self.client.create_file(os.path.join(self._cache_dir, "guild_metadata.json")),
+                await self.client.create_file(os.path.join(self._cache_dir, "history.json"))
+            ]
+        )
+
         print(f"\nInstructions: {load_instructions("./bot/instructions.txt")}")
 
         print(f"{self.user} is now up and running!")
@@ -88,11 +101,12 @@ class LuminaBot(commands.Bot):
         if (self.user in message.mentions) or (message.guild is None):
             try:
                 self.bot_active = True
+                
                 await self.client.init_thread()
                 await message.channel.send("```You have now entered a converation session with Lumina. Type `!quit` to quit.```\n")
             except Exception as e:
-                print(e, file=sys.stderr)
-                await message.channel.send("```Something went wrong```")
+                await message.channel.send("> Something went wrong. Please report issue to @PyIDK")
+                raise e
 
         if self.bot_active:
             if (len(message.mentions) > 0 and (self.user in message.mentions)) or len(message.mentions) == 0:
@@ -103,10 +117,36 @@ class LuminaBot(commands.Bot):
                         await message.channel.send(response)
                         print(f"\nLUMINA: {response}")
                 except Exception as e:
-                    print(e, file=sys.stderr)
-                    await message.channel.send("```Something went wrong```")
+                    await message.channel.send("> Something went wrong. Please report issue to @PyIDK")
+                    raise e
 
         await self.process_commands(message)
+
+    async def _fetch_guid_metadata(self) -> Dict[str, Union[str, int]]:
+        guild = self.guilds[0]
+        guild_metadata = {
+            "id": guild.id,
+            "name": guild.name,
+            "member_count": guild.member_count,
+            "members": [str(member) for member in guild.members],
+            "creation_date": str(guild.created_at),
+        }
+        return guild_metadata
+
+    async def _fetch_chat_history(self) -> Dict[str, Dict[str, str]]:
+        guild = self.guilds[0]
+        history = {}
+        for channel in guild.text_channels:
+            history_current_channel = []
+            async for msg in channel.history(limit=100):
+                current_msg = {
+                    "author": f"{msg.author.name} ({msg.author.display_name})",
+                    "time": msg.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                    "content": msg.content
+                }
+                history_current_channel.append(current_msg)
+            history[channel.name] = history_current_channel
+        return history
 
     async def _play(self):
         voice_client = discord.utils.get(self.voice_clients, guild=self.guilds[0])
