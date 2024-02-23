@@ -1,0 +1,37 @@
+@font-face {
+    font-family: "Ethnocentric";
+    src: url("./fonts/ethnocentric\ rg.ttf") format("truetype");
+}
+
+::selection {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
+body {
+    background-color: #091833;
+    color: #bd00ff;
+    margin: 50px
+}
+
+h1 {
+    font-family: "ethnocentric", sans-serif;
+    font-size: 2.5rem;
+}
+
+.recorder-button {
+    background-color: #00ff9f;
+    font-family: "ethnocentric";
+    font-size: 3em;
+    width: 80%;
+    height: 30vh;
+    margin-top: 15px;
+    margin-bottom: 30px;
+    margin-left: 50px;
+    transform: skew(-20deg);
+}
+
+.recorder-button:active {
+    background-color: #DAD1C6;
+}
+
