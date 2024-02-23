@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 
-from bot import LuminaBot
+from lumina import LuminaBot
 
 def main():
     load_dotenv()
