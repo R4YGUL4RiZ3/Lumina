@@ -68,6 +68,11 @@ class LuminaCog(commands.Cog):
         else:
             await ctx.channel.send("I'm not in a voice channel!")
 
+    @commands.command(name="uncover", help="s̵̨͈͖̙̫̮͓̿͆ͧ̈́́̿ͣ͢͠_̪̣c̶̬͔̾_a̢̢̢̳͓͈͎̝̅̓͌̓͒̒͂̓̐͛̀͛ͮͤ̊̅rͥͥ̍ͦ͞y̷͆̆ͧ̓")
+    async def prank(self, ctx: commands.Context):
+        await ctx.send("https://media1.tenor.com/m/x8v1oNUOmg4AAAAd/rickroll-roll.gif")
+        await ctx.send(ctx.author.mention + " Rick Rolled! Heehee ~ 🤣🤣")
+
 class LuminaBot(commands.Bot):
     def __init__(self, command_prefix, intents):
         super().__init__(command_prefix, intents=intents)
