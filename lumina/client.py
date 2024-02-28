@@ -60,7 +60,7 @@ class Client:
             quality=quality,
             n=1
         )
-        img_url = response.datap[0].url
+        img_url = response.data[0].url
         return img_url
 
     async def speak(self, input: str, output_file: str):
