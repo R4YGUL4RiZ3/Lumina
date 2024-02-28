@@ -33,6 +33,10 @@ class LuminaCog(commands.Cog):
         self.bot.client.cancel_run()
         await ctx.send("> Successfully made Lumina stop")
 
+    @commands.command(name="image", help="Generate an image with Dalle-3")
+    async def image(self, ctx: commands.Context, prompt: str):
+        ...
+
     @commands.command(name="join_voice", help="Joins current voice chat")
     async def join_voice(self, ctx: commands.Context):
         if ctx.author.voice and ctx.author.voice.channel:
@@ -77,14 +81,14 @@ class LuminaBot(commands.Bot):
 
         self.client.setup(
             model="gpt-3.5-turbo-0125",
-            instructions=load_instructions("./bot/instructions.txt"),
+            instructions=load_instructions("./lumina/instructions.txt"),
             files=[
                 await self.client.create_file(os.path.join(self._cache_dir, "guild_metadata.json")),
                 await self.client.create_file(os.path.join(self._cache_dir, "history.json"))
             ]
         )
 
-        print(f"\nInstructions: {load_instructions("./bot/instructions.txt")}")
+        print(f"\nInstructions: {load_instructions("./lumina/instructions.txt")}")
 
         print(f"{self.user} is now up and running!")
 
