@@ -51,18 +51,17 @@ class Client:
         return response_text
     
     async def generate_image(self, prompt: str, *,
-                             size: Literal['256x256', '512x512', '1024x1024', '1024x1792', '1792x1024'] = "512x512",
-                             quality: Literal["standard", "hd"] = "standard", num_images: int = 1) -> List[str]:
+                             size: Literal['1024x1024', '1024x1792', '1792x1024'] = "1024x1024",
+                             quality: Literal["standard", "hd"] = "standard") -> List[str]:
         response = self.client.images.generate(
             model="dall-e-3",
             prompt=prompt,
             size=size,
             quality=quality,
-            n=num_images
+            n=1
         )
-        img_urls = [data.url for data in response.data]
-        assert isinstance(img_urls, list)
-        return img_urls
+        img_url = response.datap[0].url
+        return img_url
 
     async def speak(self, input: str, output_file: str):
         response = self.client.audio.speech.create(
