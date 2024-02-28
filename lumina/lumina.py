@@ -33,6 +33,23 @@ class LuminaCog(commands.Cog):
         self.bot.client.cancel_run()
         await ctx.send("> Successfully made Lumina stop")
 
+    @commands.command(name="image", help="Generate an image with DALL·E 3")
+    async def image(self, ctx: commands.Context, prompt: str, *,
+                    size: Literal['1024x1024', '1024x1792', '1792x1024'] = '1024x1024',
+                    quality: Literal["standard", "hd"] = "standard"):
+        await ctx.send("> Lumina is generating image! Plz wait...")
+        img_url = await self.bot.client.generate_image(
+            prompt,
+            size=size,
+            quality=quality,
+        )
+        embed = discord.Embed(
+            title=prompt,
+            color = 0xd600ff
+        )
+        embed.set_image(url=img_url)
+        await ctx.send(ctx.author.mention, embed=embed)
+
     @commands.command(name="join_voice", help="Joins current voice chat")
     async def join_voice(self, ctx: commands.Context):
         if ctx.author.voice and ctx.author.voice.channel:
