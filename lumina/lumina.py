@@ -33,10 +33,6 @@ class LuminaCog(commands.Cog):
         self.bot.client.cancel_run()
         await ctx.send("> Successfully made Lumina stop")
 
-    @commands.command(name="image", help="Generate an image with Dalle-3")
-    async def image(self, ctx: commands.Context, prompt: str):
-        ...
-
     @commands.command(name="join_voice", help="Joins current voice chat")
     async def join_voice(self, ctx: commands.Context):
         if ctx.author.voice and ctx.author.voice.channel:
@@ -106,7 +102,7 @@ class LuminaBot(commands.Bot):
                 self.bot_active = True
                 
                 await self.client.init_thread()
-                await message.channel.send("```You have now entered a converation session with Lumina. Type `!quit` to quit.```\n")
+                await message.channel.send("```You have entered a converation session with Lumina. Type `!quit` to quit.```\n")
             except Exception as e:
                 await message.channel.send("> Something went wrong. Please report issue to @PyIDK")
                 raise e
