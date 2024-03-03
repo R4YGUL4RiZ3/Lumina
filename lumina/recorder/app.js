@@ -7,7 +7,7 @@ const upload = multer({ dest: 'audio/' });
 app.use(express.static("./public/"));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'recorder.html'));
+  res.sendFile("./public/recorder.js");
 });
 
 app.post('/upload', upload.single('recording'), (req, res) => {
