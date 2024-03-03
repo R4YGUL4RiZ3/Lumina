@@ -9,15 +9,20 @@
   <link rel="stylesheet" href="style.css"></link>
 </head>
 <body>
-  <h1>Live sound recorder for Lumina interaction</h1>
+  <h1 class="title">Live sound recorder for Lumina interaction</h1>
   <div>
-    <button class="recorder-button" id="start-button" onclick="">Start Recorder</button>
+    <button class="mic-btn" id="mic-btn">Start Recorder</button>
     <br>
-    <button class="recorder-button" id="stop-button" onclick="">Stop Recorder</button>
-    <br>
-    <audio id="audio-playback">audio</audio>
+    <audio class= "audio-playback" id="audio-playback" controls>audio</audio>
 
-  <script src="recorder.js"></script>
+    <a id="easter-egg-link" href="#" target="_blank">Click me! 😄</a>
+
+    <script>
+      const sites = ["https://www.youtube.com/watch?v=dQw4w9WgXcQ", "https://www.youtube.com/watch?v=QU9c0053UAU"]
+      let randomIdx = Math.floor(Math.random() * sites.length)
+      document.getElementById("easter-egg-link").href = sites[randomIdx]
+    </script>
+    <script src="recorder.js"></script>
   </div>
 </body>
 </html>
