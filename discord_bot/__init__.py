@@ -1,1 +1,1 @@
-from .lumina import LuminaBot
+from .bot import LuminaBot
