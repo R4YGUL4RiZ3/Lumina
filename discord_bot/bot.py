@@ -140,6 +140,8 @@ class LuminaBot(commands.Bot):
         await self.add_cog(LuminaCog(self))
         
     async def on_ready(self):
+        instructions_path = os.path.join(os.getcwd(), "discord_bot/instructions.txt")
+
         if not os.path.exists(self._cache_dir):
             os.makedirs(self._cache_dir)
 
@@ -153,14 +155,14 @@ class LuminaBot(commands.Bot):
 
         self.client.setup(
             model="gpt-3.5-turbo-0125",
-            instructions=load_instructions("./lumina/instructions.txt"),
+            instructions=load_instructions(instructions_path),
             files=[
                 await self.client.create_file(os.path.join(self._cache_dir, "guild_metadata.json")),
                 await self.client.create_file(os.path.join(self._cache_dir, "history.json"))
             ]
         )
 
-        print(f"\nInstructions: {load_instructions("./lumina/instructions.txt")}")
+        print(f"\nInstructions: {load_instructions(instructions_path)}")
 
         print(f"{self.user} is now up and running!")
 
