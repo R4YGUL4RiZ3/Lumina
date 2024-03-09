@@ -20,6 +20,10 @@ def upload():
         filename = secure_filename(file.filename)
         file.save(os.path.join(upload_dir, filename))
         return jsonify({'message': 'Sucessfully saved current audio clip'}), 200
+    
+@app.route('/finish-recording')
+def finish_recording():
+    ...
 
 if __name__ == "__main__":
     app.run(debug=True)

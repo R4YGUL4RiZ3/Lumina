@@ -8,7 +8,7 @@ from typing import *
 import discord
 from discord.ext import commands
 
-from .client import Client
+from openai_client import Client
 from .utils import *
 
 class LuminaCog(commands.Cog):
