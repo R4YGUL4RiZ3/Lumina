@@ -72,8 +72,8 @@ class LuminaCog(commands.Cog):
     # Easter Eggs
     @commands.command(name="rick", help="Rick")
     async def rick(self, ctx: commands.Context):
-        await ctx.send("https://www.youtube.com/watch?v=mHNCM-YALSA")
-        await ctx.send("thought i was gonna rick roll you? xd")
+        await ctx.send("https://www.youtube.com/watch?v=Jk71bPz5VLo")
+        await ctx.send("thought i was gonna rick roll you? xD")
 
     @commands.command(name="rick_roll", help="Rick Roll")
     async def rick_roll(self, ctx: commands.Context):
