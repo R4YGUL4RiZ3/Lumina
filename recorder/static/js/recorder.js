@@ -25,7 +25,8 @@ function setup() {
 
 async function sendAudio(audioBlob) {
   const formData = new FormData();
-  formData.append("audio", audioBlob, "audio.wav");
+  dt = new Date();
+  formData.append("audio", audioBlob, `recording-${dt.now()}.wav`);
 
   try {
     const response = await fetch('/upload', {
